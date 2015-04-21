@@ -21,8 +21,7 @@ Start from a clean database. See below for prefixing so that homework tables are
 -- DROP TABLE kennel;
 -- DROP TABLE animal_subtype;
 -- DROP TABLE animal_type;
-
-
+-- DROP TABLE animal_detail;
 
 /*
 *************
@@ -55,10 +54,21 @@ CREATE TABLE kennel (
   CONSTRAINT kennel_animal_type_id_fk FOREIGN KEY (animal_type_id) REFERENCES animal_type (animal_type_id) DEFERRABLE INITIALLY IMMEDIATE
 );
 
+CREATE TABLE animal_detail (
+  animal_detail_id     NUMBER(10) CONSTRAINT animal_detail_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
+  animal_detail_age    INTERVAL YEAR TO MONTH,
+  animal_detail_height FLOAT(2),
+  animal_detail_weight FLOAT(2),
+  animal_detail_color  VARCHAR2(20),
+  animal_detail_notes  VARCHAR2(255),
+  CONSTRAINT animal_detail_id_pk PRIMARY KEY (animal_detail_id) DEFERRABLE INITIALLY IMMEDIATE
+);
+
 CREATE TABLE animal (
   animal_id           NUMBER(10) CONSTRAINT animal_animal_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
   animal_subtype_id   NUMBER(10) CONSTRAINT animal_animal_subtype_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
   kennel_id           NUMBER(10),
+  animal_detail_id    NUMBER(10) CONSTRAINT animal_detail_id_uq UNIQUE DEFERRABLE INITIALLY IMMEDIATE, -- forces 1:0-1
   animal_name         VARCHAR2(50),
   animal_arrival_date DATE DEFAULT CURRENT_DATE,
   CONSTRAINT animal_animal_id_pk PRIMARY KEY (animal_id) DEFERRABLE INITIALLY IMMEDIATE,
