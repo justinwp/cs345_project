@@ -239,3 +239,47 @@ FOR EACH ROW
     :new.animal_detail_id := animal_detail_id_seq.nextval;
   END;
 /
+
+/*
+*************
+Create Views
+*************
+ */
+
+-- Public
+-- View all available animals
+
+CREATE OR REPLACE VIEW available_animals AS 
+SELECT A.animal_name, AT.animal_type_name, AST.animal_subtype_id, A.animal_arrival_date, AD.animal_detail_age, AD.animal_detail_height, AD.animal_detail_weight, AD.animal_detail_color, AD.animal_detail_notes, B.behavior_name 
+FROM animal A JOIN animal_detail AD ON A.animal_id = AD.animal_detail_id 
+JOIN animal_subtype AST ON A.animal_subtype_id = AST.animal_subtype_id 
+JOIN animal_type AT ON AST.animal_type_id = AT.animal_type_id 
+JOIN animal_behavior AB ON A.animal_id = AB.animal_id 
+JOIN behavior B ON AB.behavior_id = B.behavior_id 
+WHERE A.animal_id NOT IN 
+  (SELECT animal_id FROM adoption);
+
+-- Employee
+-- View all incomplete tasks
+
+CREATE OR REPLACE VIEW tasks_to_do AS
+SELECT T.task_name, TL.task_log_assigned_date, E.employee_first_name, E.Employee_last_name, A.animal_name, AT.animal_type_name, AST.animal_subtype_name, K.kennel_id 
+FROM task_log TL JOIN task T ON TL.task_id = T.task_id 
+JOIN employee E ON TL. task_log_assigned_to_id = E.employee_id 
+LEFT OUTER JOIN animal A ON TL.animal_id = A.animal_id 
+LEFT OUTER JOIN animal_detail AD ON A.animal_id = AD.animal_detail_id 
+LEFT OUTER JOIN animal_subtype AST ON A.animal_subtype_id = AST.animal_subtype_id 
+LEFT OUTER JOIN animal_type AT ON AST.animal_type_id = AT.animal_type_id 
+LEFT OUTER JOIN kennel K ON A.kennel_id = K.kennel_id 
+WHERE task_log_completed_date IS NULL 
+ORDER BY TL.task_log_assigned_date DESC;
+
+
+-- Manager
+-- View all employees and what animal training they have completed
+
+CREATE OR REPLACE VIEW employee_training AS
+SELECT E.employee_id, E.employee_first_name, E.employee_last_name, ATY.animal_type_name 
+FROM animal_training AT 
+FULL OUTER JOIN employee E ON AT.employee_id = E.employee_id 
+FULL OUTER JOIN animal_type ATY ON AT.animal_type_id = ATY.animal_type_id;
