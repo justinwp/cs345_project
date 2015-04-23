@@ -37,7 +37,8 @@ Create Tables
 
 CREATE TABLE animal_type (
   animal_type_id          NUMBER(10)   CONSTRAINT animal_type_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
-  animal_type_name        VARCHAR2(50) CONSTRAINT animal_type_name_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
+  animal_type_name        VARCHAR2(50) CONSTRAINT animal_type_name_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE
+    CONSTRAINT animal_type_name_uq UNIQUE DEFERRABLE INITIALLY IMMEDIATE,
   animal_type_description VARCHAR2(255),
   CONSTRAINT animal_type_id_pk PRIMARY KEY (animal_type_id) DEFERRABLE INITIALLY IMMEDIATE,
   CONSTRAINT animal_subtype_id_fk FOREIGN KEY (animal_type_id) REFERENCES animal_type (animal_type_id) DEFERRABLE INITIALLY IMMEDIATE
@@ -46,7 +47,8 @@ CREATE TABLE animal_type (
 CREATE TABLE animal_subtype (
   animal_subtype_id          NUMBER(10)   CONSTRAINT animal_subtype_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
   animal_type_id             NUMBER(10)   CONSTRAINT animal_subtype_type_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
-  animal_subtype_name        VARCHAR2(50) CONSTRAINT animal_subtype_name_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
+  animal_subtype_name        VARCHAR2(50) CONSTRAINT animal_subtype_name_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE
+    CONSTRAINT animal_subtype_name_uq UNIQUE DEFERRABLE INITIALLY IMMEDIATE,
   animal_subtype_description VARCHAR2(255),
   CONSTRAINT animal_subtype_id_pk PRIMARY KEY (animal_subtype_id) DEFERRABLE INITIALLY IMMEDIATE,
   CONSTRAINT animal_subtype_type_id_fk FOREIGN KEY (animal_type_id) REFERENCES animal_type (animal_type_id) DEFERRABLE INITIALLY IMMEDIATE
@@ -115,7 +117,8 @@ CREATE TABLE adoption (
 
 CREATE TABLE task (
   task_id          NUMBER(10)   CONSTRAINT task_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
-  task_name        VARCHAR2(50) CONSTRAINT task_name_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
+  task_name        VARCHAR2(50) CONSTRAINT task_name_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE
+    CONSTRAINT task_name_uq UNIQUE DEFERRABLE INITIALLY IMMEDIATE,
   task_description VARCHAR2(255),
   CONSTRAINT task_id_pk PRIMARY KEY (task_id) DEFERRABLE INITIALLY IMMEDIATE
 );
@@ -193,9 +196,9 @@ FOR EACH ROW
 CREATE OR REPLACE TRIGGER animal_type_id
 BEFORE INSERT ON animal_type
 FOR EACH ROW
-BEGIN
-  :new.animal_type_id := animal_type_id_seq.nextval;
-END;
+  BEGIN
+    :new.animal_type_id := animal_type_id_seq.nextval;
+  END;
 /
 
 CREATE OR REPLACE TRIGGER task_id
@@ -237,16 +240,3 @@ FOR EACH ROW
     :new.animal_detail_id := animal_detail_id_seq.nextval;
   END;
 /
-
-/*
-*****************
-Add Data to Table
-*****************
- */
--- ALTER SESSION SET CONSTRAINTS = DEFERRED;
---
--- INSERT ALL
---   INSERT INTO employee()
--- SELECT * FROM DUAL;
---
--- ALTER SESSION SET CONSTRAINTS = IMMEDIATE;
