@@ -47,8 +47,7 @@ CREATE TABLE animal_type (
 CREATE TABLE animal_subtype (
   animal_subtype_id          NUMBER(10)   CONSTRAINT animal_subtype_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
   animal_type_id             NUMBER(10)   CONSTRAINT animal_subtype_type_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
-  animal_subtype_name        VARCHAR2(50) CONSTRAINT animal_subtype_name_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE
-    CONSTRAINT animal_subtype_name_uq UNIQUE DEFERRABLE INITIALLY IMMEDIATE,
+  animal_subtype_name        VARCHAR2(50) CONSTRAINT animal_subtype_name_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
   animal_subtype_description VARCHAR2(255),
   CONSTRAINT animal_subtype_id_pk PRIMARY KEY (animal_subtype_id) DEFERRABLE INITIALLY IMMEDIATE,
   CONSTRAINT animal_subtype_type_id_fk FOREIGN KEY (animal_type_id) REFERENCES animal_type (animal_type_id) DEFERRABLE INITIALLY IMMEDIATE
