@@ -235,6 +235,14 @@ FOR EACH ROW
     :new.animal_id := animal_id_seq.nextval;
   END;
 /
+
+CREATE OR REPLACE TRIGGER adoption_delete_tasks
+  AFTER INSERT on adoption
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM task_log WHERE animal_id = :new.animal_id AND task_log_completed_date is NULL;
+    END;
+  /
 /*
 *************
 Procedures
