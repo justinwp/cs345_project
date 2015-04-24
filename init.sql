@@ -62,7 +62,7 @@ CREATE TABLE kennel (
 );
 
 CREATE TABLE animal_detail (
-  animal_id     NUMBER(10) CONSTRAINT animal_detail_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
+  animal_id            NUMBER(10) CONSTRAINT animal_detail_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
   animal_detail_age    INTERVAL YEAR TO MONTH,
   animal_detail_height FLOAT(2),
   animal_detail_weight FLOAT(2),
@@ -141,8 +141,8 @@ CREATE TABLE task_log (
 );
 
 CREATE TABLE animal_training (
-  animal_type_id      NUMBER(10) CONSTRAINT animal_training_type_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
-  employee_id         NUMBER(10) CONSTRAINT animal_training_emp_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
+  animal_type_id           NUMBER(10) CONSTRAINT animal_training_type_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
+  employee_id              NUMBER(10) CONSTRAINT animal_training_emp_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
   training_completion_date DATE DEFAULT CURRENT_DATE,
   CONSTRAINT animal_training_pk PRIMARY KEY (animal_type_id, employee_id) DEFERRABLE INITIALLY IMMEDIATE
 );
@@ -241,12 +241,60 @@ Procedures
 *************
  */
 
-CREATE PROCEDURE add_animal (name VARCHAR2, type VARCHAR2) IS
+CREATE OR REPLACE PROCEDURE add_animal(p_name VARCHAR2, p_type VARCHAR2, p_subtype VARCHAR2) IS
+  p_type_id    NUMBER;
+  p_subtype_id NUMBER;
+  p_kennel_id  NUMBER;
+  BEGIN
+    dbms_output.put_line('Begin Animal Add Procedure ');
 
-   BEGIN
+    dbms_output.put_line('Determining type... for ' || p_type);
+    SELECT COUNT(animal_type_id)
+    INTO p_type_id
+    FROM animal_type
+    WHERE lower(animal_type_name) = lower(p_type);
 
-     -- insert into animal
-   END;
+    dbms_output.put_line('Type number is: ' || p_type_id);
+
+    dbms_output.put_line('Determining subtype... for ' || p_subtype);
+
+    IF p_subtype IS NOT NULL
+    THEN
+      SELECT animal_subtype_id
+      INTO p_subtype_id
+      FROM animal_subtype
+      WHERE lower(animal_subtype_name) = lower(p_subtype) AND animal_type_id = p_type_id;
+    ELSE
+      SELECT animal_subtype_id
+      INTO p_subtype_id
+      FROM animal_subtype
+      WHERE lower(animal_subtype_name) = 'unknown' AND animal_type_id = p_type_id;
+
+    END IF;
+
+    dbms_output.put_line('Subtype number is: ' || p_subtype_id);
+
+
+    dbms_output.put_line('Finding Kennel... ');
+    SELECT kennel_id
+    INTO p_kennel_id
+    FROM kennel
+    WHERE kennel_id = (SELECT MAX(spaces)
+                       FROM kennel_capacity
+                       WHERE animal_type_id = p_type_id);
+
+    INSERT INTO animal (animal_name, animal_subtype_id, kennel_id) VALUES (p_name, p_subtype_id, p_kennel_id);
+
+    IF p_name IS NULL
+    THEN
+      dbms_output.put_line('Put Animal #' || animal_id_seq.CURRVAL || ' into Kennel #' || p_kennel_id);
+    ELSE
+      dbms_output.put_line('Put ' || p_name || ' #' || animal_id_seq.CURRVAL || ' into Kennel #' || p_kennel_id);
+
+    END IF;
+    dbms_output.put_line('End Animal Add Procedure ');
+    COMMIT;
+  END;
 /
 
 
@@ -314,3 +362,18 @@ CREATE OR REPLACE VIEW employee_training AS
   FROM animal_training AT
     FULL OUTER JOIN employee E ON AT.employee_id = E.employee_id
     FULL OUTER JOIN animal_type ATY ON AT.animal_type_id = ATY.animal_type_id;
+
+CREATE OR REPLACE VIEW kennel_capacity AS
+  SELECT
+    kennel_id,
+    NVL(kennel_space - x.filled_spaces, kennel_space) AS spaces,
+    animal_type_id
+  FROM kennel
+    LEFT OUTER JOIN (SELECT
+            kennel_id,
+            COUNT(*) AS filled_spaces
+          FROM animal
+          GROUP BY kennel_id) x USING (kennel_id)
+  ORDER BY spaces DESC;
+
+
