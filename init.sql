@@ -243,69 +243,6 @@ CREATE OR REPLACE TRIGGER adoption_delete_tasks
     DELETE FROM task_log WHERE animal_id = :new.animal_id AND task_log_completed_date is NULL;
     END;
   /
-/*
-*************
-Procedures
-*************
- */
-
-CREATE OR REPLACE PROCEDURE add_animal(p_name VARCHAR2, p_type VARCHAR2, p_subtype VARCHAR2) IS
-  p_type_id    NUMBER;
-  p_subtype_id NUMBER;
-  p_kennel_id  NUMBER;
-  BEGIN
-    dbms_output.put_line('Begin Animal Add Procedure ');
-
-    dbms_output.put_line('Determining type... for ' || p_type);
-    SELECT COUNT(animal_type_id)
-    INTO p_type_id
-    FROM animal_type
-    WHERE lower(animal_type_name) = lower(p_type);
-
-    dbms_output.put_line('Type number is: ' || p_type_id);
-
-    dbms_output.put_line('Determining subtype... for ' || p_subtype);
-
-    IF p_subtype IS NOT NULL
-    THEN
-      SELECT animal_subtype_id
-      INTO p_subtype_id
-      FROM animal_subtype
-      WHERE lower(animal_subtype_name) = lower(p_subtype) AND animal_type_id = p_type_id;
-    ELSE
-      SELECT animal_subtype_id
-      INTO p_subtype_id
-      FROM animal_subtype
-      WHERE lower(animal_subtype_name) = 'unknown' AND animal_type_id = p_type_id;
-
-    END IF;
-
-    dbms_output.put_line('Subtype number is: ' || p_subtype_id);
-
-
-    dbms_output.put_line('Finding Kennel... ');
-    SELECT kennel_id
-    INTO p_kennel_id
-    FROM kennel
-    WHERE kennel_id = (SELECT MAX(spaces)
-                       FROM kennel_capacity
-                       WHERE animal_type_id = p_type_id);
-
-    INSERT INTO animal (animal_name, animal_subtype_id, kennel_id) VALUES (p_name, p_subtype_id, p_kennel_id);
-
-    IF p_name IS NULL
-    THEN
-      dbms_output.put_line('Put Animal #' || animal_id_seq.CURRVAL || ' into Kennel #' || p_kennel_id);
-    ELSE
-      dbms_output.put_line('Put ' || p_name || ' #' || animal_id_seq.CURRVAL || ' into Kennel #' || p_kennel_id);
-
-    END IF;
-    dbms_output.put_line('End Animal Add Procedure ');
-    COMMIT;
-  END;
-/
-
-
 
 /*
 *************
@@ -383,5 +320,67 @@ CREATE OR REPLACE VIEW kennel_capacity AS
           FROM animal
           GROUP BY kennel_id) x USING (kennel_id)
   ORDER BY spaces DESC;
+
+/*
+*************
+Procedures
+*************
+ */
+
+CREATE OR REPLACE PROCEDURE add_animal(p_name VARCHAR2, p_type VARCHAR2, p_subtype VARCHAR2) IS
+  p_type_id    NUMBER;
+  p_subtype_id NUMBER;
+  p_kennel_id  NUMBER;
+  BEGIN
+    dbms_output.put_line('Begin Animal Add Procedure ');
+
+    dbms_output.put_line('Determining type... for ' || p_type);
+    SELECT COUNT(animal_type_id)
+    INTO p_type_id
+    FROM animal_type
+    WHERE lower(animal_type_name) = lower(p_type);
+
+    dbms_output.put_line('Type number is: ' || p_type_id);
+
+    dbms_output.put_line('Determining subtype... for ' || p_subtype);
+
+    IF p_subtype IS NOT NULL
+    THEN
+      SELECT animal_subtype_id
+      INTO p_subtype_id
+      FROM animal_subtype
+      WHERE lower(animal_subtype_name) = lower(p_subtype) AND animal_type_id = p_type_id;
+    ELSE
+      SELECT animal_subtype_id
+      INTO p_subtype_id
+      FROM animal_subtype
+      WHERE lower(animal_subtype_name) = 'unknown' AND animal_type_id = p_type_id;
+
+    END IF;
+
+    dbms_output.put_line('Subtype number is: ' || p_subtype_id);
+
+
+    dbms_output.put_line('Finding Kennel... ');
+    SELECT kennel_id
+    INTO p_kennel_id
+    FROM kennel
+    WHERE kennel_id = (SELECT MAX(spaces)
+                       FROM kennel_capacity
+                       WHERE animal_type_id = p_type_id);
+
+    INSERT INTO animal (animal_name, animal_subtype_id, kennel_id) VALUES (p_name, p_subtype_id, p_kennel_id);
+
+    IF p_name IS NULL
+    THEN
+      dbms_output.put_line('Put Animal #' || animal_id_seq.CURRVAL || ' into Kennel #' || p_kennel_id);
+    ELSE
+      dbms_output.put_line('Put ' || p_name || ' #' || animal_id_seq.CURRVAL || ' into Kennel #' || p_kennel_id);
+
+    END IF;
+    dbms_output.put_line('End Animal Add Procedure ');
+    COMMIT;
+  END;
+/
 
 
