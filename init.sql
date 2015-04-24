@@ -230,14 +230,6 @@ FOR EACH ROW
   END;
 /
 
-CREATE OR REPLACE TRIGGER animal_detail_id
-BEFORE INSERT ON animal_detail
-FOR EACH ROW
-  BEGIN
-    :new.animal_detail_id := animal_detail_id_seq.nextval;
-  END;
-/
-
 /*
 *************
 Create Views

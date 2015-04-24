@@ -26,7 +26,6 @@ DROP SEQUENCE task_log_id_seq;
 DROP SEQUENCE task_id_seq;
 DROP SEQUENCE adoption_id_seq;
 DROP SEQUENCE animal_id_seq;
-DROP SEQUENCE animal_detail_id_seq;
 
 CREATE SEQUENCE employee_id_seq START WITH 1 INCREMENT BY 1 NOMAXVALUE;
 CREATE SEQUENCE behavior_id_seq START WITH 1 INCREMENT BY 1 NOMAXVALUE;
@@ -37,8 +36,6 @@ CREATE SEQUENCE task_log_id_seq START WITH 1 INCREMENT BY 1 NOMAXVALUE;
 CREATE SEQUENCE task_id_seq START WITH 1 INCREMENT BY 1 NOMAXVALUE;
 CREATE SEQUENCE adoption_id_seq START WITH 1 INCREMENT BY 1 NOMAXVALUE;
 CREATE SEQUENCE animal_id_seq START WITH 1 INCREMENT BY 1 NOMAXVALUE;
-CREATE SEQUENCE animal_detail_id_seq START WITH 1 INCREMENT BY 1 NOMAXVALUE;
-
 
 /*
 Populate static tables
@@ -100,17 +97,17 @@ BEGIN
   INSERT INTO kennel (kennel_space, animal_type_id) VALUES (10, dog_id);
   INSERT INTO kennel (kennel_space, animal_type_id) VALUES (5, cat_id);
 
-  INSERT INTO animal_detail VALUES (NULL, NULL, 10, 20, 'Brown', 'Smells bad.');
-  INSERT INTO animal_detail VALUES (NULL, NULL, 20, 20, 'Black', NULL);
-  INSERT INTO animal_detail VALUES (NULL, NULL, 30, 20.12, 'Brown', NULL);
-  INSERT INTO animal_detail VALUES (NULL, NULL, 40, 100.2, 'Tan', 'Very big.');
-  INSERT INTO animal_detail VALUES (NULL, NULL, 10, 10.21, 'Brown', NULL);
+  INSERT INTO animal_detail VALUES (1, NULL, 10, 20, 'Brown', 'Smells bad.');
+  INSERT INTO animal_detail VALUES (2, NULL, 20, 20, 'Black', NULL);
+  INSERT INTO animal_detail VALUES (3, NULL, 30, 20.12, 'Brown', NULL);
+  INSERT INTO animal_detail VALUES (4, NULL, 40, 100.2, 'Tan', 'Very big.');
+  INSERT INTO animal_detail VALUES (5, NULL, 10, 10.21, 'Brown', NULL);
 
-  INSERT INTO animal(animal_subtype_id, kennel_id, animal_name, animal_detail_id) VALUES(1, 1, 'Sparky', 1);
-  INSERT INTO animal(animal_subtype_id, kennel_id, animal_name, animal_detail_id) VALUES(1, 2, 'Toto', 2);
-  INSERT INTO animal(animal_subtype_id, kennel_id, animal_name, animal_detail_id) VALUES(1, 3, 'Barks', 3);
-  INSERT INTO animal(animal_subtype_id, kennel_id, animal_name, animal_detail_id) VALUES(1, 2, 'Buddy', 4);
-  INSERT INTO animal(animal_subtype_id, kennel_id, animal_name, animal_detail_id) VALUES(7, 5, 'Sneaky', 5);
+  INSERT INTO animal(animal_subtype_id, kennel_id, animal_name) VALUES(1, 1, 'Sparky');
+  INSERT INTO animal(animal_subtype_id, kennel_id, animal_name) VALUES(1, 2, 'Toto');
+  INSERT INTO animal(animal_subtype_id, kennel_id, animal_name) VALUES(1, 3, 'Barks');
+  INSERT INTO animal(animal_subtype_id, kennel_id, animal_name) VALUES(1, 2, 'Buddy');
+  INSERT INTO animal(animal_subtype_id, kennel_id, animal_name) VALUES(7, 5, 'Sneaky');
   INSERT INTO animal(animal_subtype_id, kennel_id, animal_name) VALUES(7, 5, 'Cat123');
   INSERT INTO animal(animal_subtype_id, kennel_id, animal_name) VALUES(7, 5, 'Cat124');
   INSERT INTO animal(animal_subtype_id, kennel_id, animal_name) VALUES(7, 7, 'Cat125');
