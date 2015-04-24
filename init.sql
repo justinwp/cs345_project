@@ -237,12 +237,13 @@ FOR EACH ROW
 /
 
 CREATE OR REPLACE TRIGGER adoption_delete_tasks
-  AFTER INSERT on adoption
-  FOR EACH ROW
+AFTER INSERT ON adoption
+FOR EACH ROW
   BEGIN
-    DELETE FROM task_log WHERE animal_id = :new.animal_id AND task_log_completed_date is NULL;
-    END;
-  /
+    DELETE FROM task_log
+    WHERE animal_id = :new.animal_id AND task_log_completed_date IS NULL;
+  END;
+/
 
 /*
 ************
@@ -266,6 +267,16 @@ IS
       THEN RETURN 'tiny';
     ELSE RETURN 'unknown';
     END CASE;
+  END;
+/
+
+CREATE OR REPLACE FUNCTION convert_weight(imperialWeight IN FLOAT)
+  RETURN FLOAT
+IS
+  metricWeight FLOAT := 0;
+  BEGIN
+    metricWeight := imperialWeight / 2.2;
+    RETURN metricWeight;
   END;
 /
 
@@ -340,10 +351,10 @@ CREATE OR REPLACE VIEW kennel_capacity AS
     animal_type_id
   FROM kennel
     LEFT OUTER JOIN (SELECT
-            kennel_id,
-            COUNT(*) AS filled_spaces
-          FROM animal
-          GROUP BY kennel_id) x USING (kennel_id)
+                       kennel_id,
+                       COUNT(*) AS filled_spaces
+                     FROM animal
+                     GROUP BY kennel_id) x USING (kennel_id)
   ORDER BY spaces DESC;
 
 /*
