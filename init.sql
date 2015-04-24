@@ -245,6 +245,31 @@ CREATE OR REPLACE TRIGGER adoption_delete_tasks
   /
 
 /*
+************
+Functions
+
+************
+ */
+
+CREATE OR REPLACE FUNCTION animal_size(height IN FLOAT, weight IN FLOAT)
+  RETURN VARCHAR2
+IS
+  BEGIN
+    CASE
+      WHEN height > 36 OR weight > 80
+      THEN RETURN 'large';
+      WHEN height > 20 OR weight > 40
+      THEN RETURN 'medium';
+      WHEN height > 10 OR weight > 15
+      THEN RETURN 'small';
+      WHEN height < 10 OR weight < 20
+      THEN RETURN 'tiny';
+    ELSE RETURN 'unknown';
+    END CASE;
+  END;
+/
+
+/*
 *************
 Create Views
 *************
@@ -362,12 +387,16 @@ CREATE OR REPLACE PROCEDURE add_animal(p_name VARCHAR2, p_type VARCHAR2, p_subty
 
 
     dbms_output.put_line('Finding Kennel... ');
+
     SELECT kennel_id
     INTO p_kennel_id
     FROM kennel
-    WHERE kennel_id = (SELECT MAX(spaces)
-                       FROM kennel_capacity
-                       WHERE animal_type_id = p_type_id);
+    WHERE kennel_id = (SELECT kennel_id
+                       FROM (SELECT kennel_id
+                             FROM kennel_capacity
+                             WHERE animal_type_id = p_type_id
+                             ORDER BY spaces DESC)
+                       WHERE rownum = 1);
 
     INSERT INTO animal (animal_name, animal_subtype_id, kennel_id) VALUES (p_name, p_subtype_id, p_kennel_id);
 
