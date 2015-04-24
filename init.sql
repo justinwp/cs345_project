@@ -253,14 +253,13 @@ WHERE A.animal_id NOT IN
 -- View all incomplete tasks
 
 CREATE OR REPLACE VIEW tasks_to_do AS
-SELECT T.task_name, TL.task_log_assigned_date, E.employee_first_name, E.Employee_last_name, A.animal_name, AT.animal_type_name, AST.animal_subtype_name, K.kennel_id 
+SELECT T.task_name, TL.task_log_assigned_date, E.employee_first_name, E.Employee_last_name, A.animal_name, AT.animal_type_name, AST.animal_subtype_name 
 FROM task_log TL 
 JOIN task T ON TL.task_id = T.task_id 
 JOIN employee E ON TL. task_log_assigned_to_id = E.employee_id 
 LEFT OUTER JOIN animal A ON TL.animal_id = A.animal_id 
 LEFT OUTER JOIN animal_detail AD ON A.animal_id = AD.animal_id 
 LEFT OUTER JOIN animal_subtype AST ON A.animal_subtype_id = AST.animal_subtype_id JOIN animal_type AT ON AST.animal_type_id = AT.animal_type_id 
-LEFT OUTER JOIN kennel K ON TL.kennel_id = K.kennel_id 
 WHERE task_log_completed_date IS NULL 
 ORDER BY TL.task_log_assigned_date DESC;
 
