@@ -125,7 +125,6 @@ CREATE TABLE task_log (
   task_log_id             NUMBER(10) CONSTRAINT task_log_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
   task_id                 NUMBER(10) CONSTRAINT task_log_task_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
   kennel_id               NUMBER(10),
-  employee_id             NUMBER(10),
   task_log_assigned_by_id NUMBER(10) CONSTRAINT task_log_assigned_by_id_nn NOT NULL DEFERRABLE INITIALLY IMMEDIATE,
   task_log_assigned_to_id NUMBER(10),
   animal_id               NUMBER(10),
